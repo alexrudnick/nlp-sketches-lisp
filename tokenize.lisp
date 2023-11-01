@@ -38,21 +38,3 @@
     (format t "here's you some words...~%")
     (loop for word in words do
           (format t "word: [~a] ~%" word))))
-
-(print-word-list
-  (split-by-spaces "this ought to return a list of words"))
-
-(print-word-list
-  (split-by-spaces "this       ought to return a list of words"))
-
-(print-word-list
-  (split-by-spaces "this ought to return a list of words     "))
-
-(print-word-list
-  (split-by-spaces "  this ought to return a list of words     "))
-
-(format t "~a~%"
-  (whitespacep #\Space))
-
-(format t "~a~%"
-  (whitespacep #\z))
