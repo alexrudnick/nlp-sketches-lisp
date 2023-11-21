@@ -7,6 +7,8 @@
 
 (load "~/quicklisp/setup.lisp")
 (ql:quickload "cl-ppcre")
+(asdf:oos 'asdf:load-op :cl-ppcre-unicode)
+
  
 (defpackage :tokenize (:use :cl :cl-ppcre))
 (in-package :tokenize)
@@ -61,10 +63,7 @@
              (replacement (cdar regex-pairs)))
          (apply-every-regex
            (cdr regex-pairs)
-           (progn
-             (let ((next-text (regex-replace-all regex text replacement)))
-               (format t "~a~%" next-text)
-               next-text)))))))
+           (regex-replace-all regex text replacement))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; misc utilities
@@ -75,7 +74,6 @@
     (format t "here's you some words...~%")
     (loop for word in words do
           (format t "word: [~a] ~%" word))))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; toktok patterns
