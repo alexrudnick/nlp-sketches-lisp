@@ -18,6 +18,8 @@
   (tokenize::split-by-spaces
     "They thought , \" Is 9.5 or 525,600 my favorite number ? \" before seeing Dr. Bob ' s dog talk ."))
 
+
+
 (tokenize::print-word-list
   (tokenize::toktok-tokenize
     *dr-bob-joined*))
