@@ -99,6 +99,9 @@
 (defconstant *toktok-regex-pairs*
   (list
         *non-breaking*
+        ;; XXX: this is a messy hack and I think it means there's something
+        ;; wrong with final-period-2 or perhaps funky-punct-2.
+        *final-period-2*
         *funky-punct-1*
         *funky-punct-2*
         *url-foe-1*
