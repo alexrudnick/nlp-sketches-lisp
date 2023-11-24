@@ -18,6 +18,21 @@
     (V -> "tanks")
     (P -> "with")))
 
+(defvar *pos-rules-2*
+  '((NP -> "binoculars")
+    (NP -> "bob")
+    (NP -> "mary")
+    (NP -> "saw")
+    (V -> "saw")
+    (P -> "with")))
+
+(defvar *grammar-rules-2*
+ '((S -> NP VP)
+   (VP -> V NP)
+   (VP -> VP PP)
+   (PP -> P NP)
+   (NP -> NP PP)))
+
 ;; going to return a list of (index postag word)
 (defun pos-tag (words rules)
   (pos-tag-help 0 words rules rules))
@@ -76,11 +91,14 @@
                                               (gethash span chart))))))))))))
       chart)))
 
-(defparameter *sentence* (list "people" "fish" "fish"))
 
+
+
+(format t "####################################~%")
+(format t "example: people fish fish~%")
+(defparameter *sentence* (list "people" "fish" "fish"))
 (setf parsed
   (build-chart *pos-rules* *grammar-rules* *sentence*))
-
 
 (format t "contents of the chart...~%")
 (loop for key being the hash-key of parsed
@@ -92,6 +110,23 @@
       (if (equalp (car entry) 'S)
         (format t "complete parse: ~a~%" entry)))
 
+
+(format t "####################################~%")
+(format t "example: mary saw bob with binoculars~%")
+(defparameter *sentence-2* (list "mary" "saw" "bob" "with" "binoculars"))
+
+(setf parsed
+  (build-chart *pos-rules-2* *grammar-rules-2* *sentence-2*))
+
+(format t "contents of the chart...~%")
+(loop for key being the hash-key of parsed
+      do (progn
+           (format t "~a~%" key)
+           (format t "  ~a~%" (gethash key parsed))))
+
+(loop for entry in (gethash (list 0 (length *sentence-2*)) parsed) do
+      (if (equalp (car entry) 'S)
+        (format t "complete parse: ~a~%" entry)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; WIP; make this much cleaner and lispier. The earlier version is a close
