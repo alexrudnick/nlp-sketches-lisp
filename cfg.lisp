@@ -53,6 +53,14 @@
     (t (pos-tag-help index words (cdr rules) orig-rules))))
 
 
+(defun width-start-split-triples (wordlength)
+    (loop for width from 2 to wordlength append
+      ;; for start in range(0, len(words) + 1 - width):
+      (loop for start from 0 to (- wordlength width) append
+          ;; for split in range(1, width):
+            (loop for split from 1 to (- width 1) collect
+                  (list width start split)))))
+
 (defun build-chart (word-grammar rule-grammar words)
   (let ((chart (make-hash-table :test #'equalp)))
     (progn
@@ -69,30 +77,25 @@
 
       ;; now do production rules
       ;; for every width 2..whole sentence
-      (loop for width from 2 to (length words) do
-        ;; for start in range(0, len(words) + 1 - width):
-        (loop for start from 0 to (- (length words) width) do
-            ;; for split in range(1, width):
-            (let ((span (list start (+ start width))))
-              (loop for split from 1 to (- width 1) do
-                  (format t "width ~a start ~a split ~a~%" width start split)
-                  ;; for every production...
-                  (loop for rule in rule-grammar do
-                        (let ((A (caddr rule))
-                              (B (cadddr rule)))
-                          (loop for leftcell in
-                                (gethash (list start (+ start split)) chart) do
-                            (loop for rightcell in
-                                (gethash (list (+ start split) (+ start width)) chart) do
-                                (if (and (equalp (car leftcell) A)
-                                         (equalp (car rightcell) B))
-                                  (setf (gethash span chart)
-                                        (cons (list (car rule) leftcell rightcell)
-                                              (gethash span chart))))))))))))
+      (loop for triple in (width-start-split-triples (length words)) do
+        (let* ((width (car triple))
+               (start (cadr triple))
+               (split (caddr triple))
+               (span (list start (+ start width))))
+          ;; for every production...
+          (loop for rule in rule-grammar do
+                (let ((A (caddr rule))
+                      (B (cadddr rule)))
+                  (loop for leftcell in
+                        (gethash (list start (+ start split)) chart) do
+                    (loop for rightcell in
+                        (gethash (list (+ start split) (+ start width)) chart) do
+                        (if (and (equalp (car leftcell) A)
+                                 (equalp (car rightcell) B))
+                          (setf (gethash span chart)
+                                (cons (list (car rule) leftcell rightcell)
+                                      (gethash span chart))))))))))
       chart)))
-
-
-
 
 (format t "####################################~%")
 (format t "example: people fish fish~%")
