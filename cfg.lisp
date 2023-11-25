@@ -67,7 +67,7 @@
       (let ((tagged (pos-tag words word-grammar)))
         (loop for entry in tagged do
               (progn
-                (format t "~a~%" entry)
+                ;; (format t "~a~%" entry)
                 (let ((span (list (car entry) (+ 1 (car entry)))))
                 ;; the entries in the hash table are keyed by (start, end) and
                 ;; they are lists of what's in that span.
@@ -97,39 +97,31 @@
                                       (gethash span chart))))))))))
       chart)))
 
-(format t "####################################~%")
-(format t "example: people fish fish~%")
-(defparameter *sentence* (list "people" "fish" "fish"))
-(setf parsed
-  (build-chart *pos-rules* *grammar-rules* *sentence*))
 
-(format t "contents of the chart...~%")
-(loop for key being the hash-key of parsed
-      do (progn
-           (format t "~a~%" key)
-           (format t "  ~a~%" (gethash key parsed))))
+(defun cky-demo (sentence pos-rules grammar-rules &optional (print-chart nil))
+  (progn
+    (format t "~%####################################~%")
+    (format t "example: ~a~%" sentence)
+    (let ((parsed (build-chart pos-rules grammar-rules sentence)))
+      (progn
+        (if print-chart (progn
+          (format t "contents of the chart...~%")
+          (loop for key being the hash-key of parsed
+                do (progn
+                     (format t "~a~%" key)
+                     (format t "  ~a~%" (gethash key parsed))))))
 
-(loop for entry in (gethash (list 0 (length *sentence*)) parsed) do
-      (if (equalp (car entry) 'S)
-        (format t "complete parse: ~a~%" entry)))
+        (loop for entry in (gethash (list 0 (length sentence)) parsed) do
+            (if (equalp (car entry) 'S)
+              (format t "complete parse: ~a~%" entry)))))))
 
 
-(format t "####################################~%")
-(format t "example: mary saw bob with binoculars~%")
-(defparameter *sentence-2* (list "mary" "saw" "bob" "with" "binoculars"))
+(cky-demo (list "people" "fish" "fish") *pos-rules* *grammar-rules*)
 
-(setf parsed
-  (build-chart *pos-rules-2* *grammar-rules-2* *sentence-2*))
 
-(format t "contents of the chart...~%")
-(loop for key being the hash-key of parsed
-      do (progn
-           (format t "~a~%" key)
-           (format t "  ~a~%" (gethash key parsed))))
-
-(loop for entry in (gethash (list 0 (length *sentence-2*)) parsed) do
-      (if (equalp (car entry) 'S)
-        (format t "complete parse: ~a~%" entry)))
+(cky-demo (list "mary" "saw" "bob" "with" "binoculars")
+          *pos-rules-2*
+          *grammar-rules-2*)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; WIP; make this much cleaner and lispier. The earlier version is a close
